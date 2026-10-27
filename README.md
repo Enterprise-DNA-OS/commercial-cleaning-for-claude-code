@@ -40,7 +40,7 @@
 
 Commercial Cleaning for Claude Code does the job you pay Swept for, as a Postgres database and a set of agent commands. There is no web front end. You open the folder in [Claude Code](https://claude.com/claude-code) (or Codex, OpenCode, Cursor: see `AGENTS.md`) and ask for what you want in plain language. It runs the right query, and it can answer questions the Swept dashboard cannot.
 
-Swept prices by location, in bands: its Scale plan starts at $225 a month for up to 15 locations and $500 a month for up to 50, and above 50 locations it is a custom quote ([sweptworks.com/plan-pricing](https://sweptworks.com/plan-pricing), checked 27 October 2026). Every site you win moves you up a band. Here the database is yours, and a new site costs nothing.
+Swept prices by location, in bands: its Scale plan starts at $225 a month for up to 15 locations, and above 50 locations it is a custom quote ([sweptworks.com/plan-pricing](https://sweptworks.com/plan-pricing), checked 27 October 2026). Every site you win moves you up a band. Here the database is yours, and a new site costs nothing.
 
 Want the same thing with a phone app for your cleaners, or built on a different stack? That is a customisation, and it is exactly what Enterprise DNA does: [book a call](https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=swept).
 

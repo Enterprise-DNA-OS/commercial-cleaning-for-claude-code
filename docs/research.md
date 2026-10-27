@@ -4,7 +4,7 @@ Picked on 27 October 2026 as a new family for the Enterprise DNA rebuild series:
 
 ## The bill
 
-Swept prices by location, in bands ([sweptworks.com/plan-pricing](https://sweptworks.com/plan-pricing), checked 27 October 2026; the page shows "$" and does not name the currency):
+Swept prices by location, in bands ([sweptworks.com/plan-pricing](https://sweptworks.com/plan-pricing), checked 27 October 2026; the page shows "$" and does not name the currency; the 50-location figures are in the page's price data, shown by its location selector):
 
 | Plan | Up to 15 locations | Up to 50 locations |
 |---|---|---|
