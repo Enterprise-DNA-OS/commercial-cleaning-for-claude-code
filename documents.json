@@ -1,11 +1,51 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
+    "name": "invoice",
+    "title": "Tax invoice",
+    "for_each": "select i.id, i.ref || ' ' || c.name as label from invoices i join clients c on c.id = i.client_id order by i.ref",
+    "file": "label",
+    "sections": [
+      { "title": "Invoice", "layout": "record", "sql": "select i.ref as invoice, c.name as client, c.contact_name as attention, to_char(i.month, 'Month YYYY') as month, i.issued_on, i.due_on, i.currency from invoices i join clients c on c.id = i.client_id where i.id = $1" },
+      { "title": "Lines", "sql": "select l.description, l.kind, i.currency, l.amount_cents from invoice_lines l join invoices i on i.id = l.invoice_id where l.invoice_id = $1 order by l.kind, l.description" },
+      { "title": "Total", "layout": "record", "sql": "select currency, subtotal_cents, gst_cents, total_cents from invoices where id = $1" }
+    ]
+  },
+  {
+    "name": "inspection-report",
+    "title": "Quality inspection report",
+    "for_each": "select i.id, i.ref || ' ' || s.name as label from inspections i join sites s on s.id = i.site_id order by i.ref",
+    "file": "label",
+    "sections": [
+      { "title": "Inspection", "layout": "record", "sql": "select ref, site_name as site, inspected_on, inspector, with_client, items_checked, faults, score_pct from v_inspections where id = $1" },
+      { "title": "Faults found", "sql": "select area, item, fix_by, fixed_on, fixed_by from faults where inspection_id = $1 order by area, item" }
+    ]
+  },
+  {
+    "name": "scope-of-works",
+    "title": "Scope of works",
+    "for_each": "select id, name from sites order by code",
     "file": "name",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      { "title": "Site", "layout": "record", "sql": "select s.name as site, c.name as client, s.address, s.days_a_week as days_a_week, s.contract_start, s.contract_end from sites s join clients c on c.id = s.client_id where s.id = $1" },
+      { "title": "Tasks", "sql": "select area, task, frequency from scope_tasks where site_id = $1 and active order by frequency_days(frequency), area, task" }
+    ]
+  },
+  {
+    "name": "incident-report",
+    "title": "Incident report",
+    "for_each": "select i.id, i.ref || ' ' || s.code as label from incidents i join sites s on s.id = i.site_id order by i.ref",
+    "file": "label",
+    "sections": [
+      { "title": "Incident", "layout": "record", "sql": "select ref, site, client, occurred_at, kind, summary, cleaner, injury, notifiable, regulator_notified_at, regulator_reference, client_notified_at, standing from v_incidents where id = $1" }
+    ]
+  },
+  {
+    "name": "key-register",
+    "title": "Key and access register",
+    "for_each": "select id, name from sites where exists (select 1 from keys k where k.site_id = sites.id) order by code",
+    "file": "name",
+    "sections": [
+      { "title": "Keys, cards and codes", "sql": "select label, kind, held_by, issued_on, standing from v_keys where site_id = $1 order by label" }
     ]
   }
 ]

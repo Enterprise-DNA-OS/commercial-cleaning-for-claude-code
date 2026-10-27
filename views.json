@@ -2,12 +2,62 @@
   {
     "name": "week",
     "title": "This week",
-    "subtitle": "Commercial Cleaning for Claude Code: what needs attention, rendered by npm run view",
+    "subtitle": "What needs a person, the roster against the price, and the money. Rendered by npm run view.",
     "sections": [
       {
-        "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
+        "title": "Contract changes",
+        "note": "In New Zealand, cleaners must be told of their right to transfer 20 working days before the change (ERA 2000 s 69G).",
+        "sql": "select site, direction, other_contractor, takes_effect_on, tell_by, cleaners_told_on, transfer_info_on, standing from v_contract_changes where standing <> 'done' order by takes_effect_on"
+      },
+      {
+        "title": "Open visits, next 14 days",
+        "sql": "select ref, site, to_char(starts_at, 'Dy DD Mon HH24:MI') as starts, planned_hours as hours, note from v_visits where status = 'open' and ends_at > site_now and starts_at < site_now + interval '14 days' order by starts_at"
+      },
+      {
+        "title": "Hours this week against the price",
+        "sql": "select site, client, budget_hours_week as priced, rostered_hours as rostered, open_hours as open, worked_hours as worked_so_far from v_site_week order by rostered_hours - budget_hours_week desc"
+      },
+      {
+        "title": "Visits breaking a rule, next 14 days",
+        "sql": "select p.ref, v.site, v.cleaner, to_char(v.starts_at, 'Dy DD Mon HH24:MI') as starts, p.kind, p.problem from v_visit_problems p join v_visits v on v.id = p.visit_id where v.status = 'planned' and v.starts_at < v.site_now + interval '14 days' order by case p.kind when 'award' then 0 when 'clash' then 1 when 'contract' then 2 else 3 end, v.starts_at"
+      },
+      {
+        "title": "Invoices not paid",
+        "sql": "select i.ref, c.code as client, i.currency, i.total_cents, i.due_on, case when i.sent_on is null then 'not sent' when i.due_on < current_date then 'overdue' else 'sent' end as standing from invoices i join clients c on c.id = i.client_id where i.paid_on is null order by i.due_on"
+      }
+    ]
+  },
+  {
+    "name": "quality",
+    "title": "Quality",
+    "subtitle": "Inspections, faults, complaints and periodicals by site.",
+    "sections": [
+      {
+        "title": "Sites",
+        "sql": "select site, client, last_inspected, days_since, last_score, score_90_days, open_faults, complaints_90_days from v_site_quality order by last_score nulls first"
+      },
+      {
+        "title": "Faults still open",
+        "sql": "select i.ref, i.site, f.area, f.item, f.fix_by, case when f.fix_by < current_date then 'late' else 'open' end as standing from faults f join v_inspections i on i.id = f.inspection_id where f.fixed_on is null order by f.fix_by"
+      },
+      {
+        "title": "Complaints not resolved",
+        "sql": "select ref, site, from_name, category, summary, hours_to_respond, standing from v_complaints where standing <> 'resolved' order by received_at"
+      },
+      {
+        "title": "Periodicals due in the next 30 days or late",
+        "sql": "select site, area, task, frequency, last_done_on, due_on, days_late from v_periodicals where days_late > -30 order by days_late desc"
+      }
+    ]
+  },
+  {
+    "name": "margins",
+    "title": "Margins",
+    "subtitle": "Each site over the last 28 days: the fee earned against the hours worked at each cleaner's rate plus on-costs.",
+    "sections": [
+      {
+        "title": "By site, thinnest first",
+        "sql": "select site, client, currency, fee_28_days_cents, worked_hours, budget_hours, labour_cents, fee_28_days_cents - labour_cents as margin_cents, round(100.0 * (fee_28_days_cents - labour_cents) / nullif(fee_28_days_cents, 0))::int as margin_pct from v_site_margin order by margin_pct nulls last"
       }
     ]
   }
